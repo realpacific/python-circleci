@@ -1,12 +1,12 @@
 version: 2.0
 
 orbs:
-    hello: circleci/python:3.6.2-stretch-browsers
+  hello: circleci/python:3.6.2-stretch-browsers
 
 workflows:
-    "Hello Workflow":
-        jobs:
-          - hello/hello-build
+  "Hello Workflow":
+    jobs:
+      - hello/hello-build
 
 jobs:
   build:
@@ -14,4 +14,22 @@ jobs:
       - image: circleci/python:3.6.2-stretch-browsers
     steps:
       - checkout # check out the code in the project directory
-      - run: echo "hello world" # run the `echo` command
+      - run:
+          name: "Printing Hello world"
+          command: echo "hello world"
+      - run:
+          name: "Creating new directory.."
+          command: |
+            mkdir output
+            cd output
+            mkdir artifacts
+            mkdir test_results
+      - run:
+          name: "Execution python file"
+          command: python hello.py
+      - store_artifacts:
+          name: "Saving result in a file"
+          path: output/artifacts
+          destination: reports
+      - store_test_results:
+          path: output/test_results
