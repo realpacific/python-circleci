@@ -1,17 +1,10 @@
 version: 2.0
 # Run using circleci local execute --job build
-orbs:
-  hello: circleci/python:3.6.2-stretch-browsers
-
-workflows:
-  "Hello Workflow":
-    jobs:
-      - hello/hello-build
 
 jobs:
   build:
     docker: # use the docker executor type; machine and macos executors are also supported
-      - image: circleci/python:3.6.2-stretch-browsers
+      - image: circleci/python:3.6.4
     steps:
       - checkout # check out the code in the project directory
       - run:
@@ -35,7 +28,7 @@ jobs:
           command: pip install --user numpy 
       - run:
           name: "Execution np.py python file"
-          command: python np.py
+          command: python np.py test
       - store_artifacts:
           name: "Saving result in a file"
           path: output/artifacts
