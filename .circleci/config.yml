@@ -2,10 +2,11 @@ version: 2.0
 # Run using circleci local execute --job build
 
 jobs:
-  build:
+  one:
     docker: # use the docker executor type; machine and macos executors are also supported
       - image: circleci/python:3.6.4
     steps:
+      - run: echo "Running job 1"
       - checkout # check out the code in the project directory
       - run:
           name: "Printing Hello world"
@@ -23,15 +24,23 @@ jobs:
       - run:
           name: "Execution hello.py python file"
           command: python hello.py
-      - run:
+
+    two:
+      docker:
+        -image: circleci/python:3.6.4
+      steps:
+        - run: echo "Running job 2"
+        - checkout
+        - run:
           name: "Getting numpy dependency"
-          command: pip install --user numpy 
-      - run:
+          command: pip install --user numpy
+        - run:
           name: "Execution np.py python file"
           command: python np.py test
-      - store_artifacts:
-          name: "Saving result in a file"
-          path: output/artifacts
-          destination: reports
-      - store_test_results:
-          path: output/test_results
+
+workflows:
+  version: 2
+  one_and_two:
+    jobs:
+      - one
+      - two
