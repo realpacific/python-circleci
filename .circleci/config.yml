@@ -1,22 +1,17 @@
 version: 2.0
 # Run using circleci local execute --job build
-orbs:
-  hello: circleci/python:3.6.2-stretch-browsers
-
-workflows:
-  "Hello Workflow":
-    jobs:
-      - hello/hello-build
 
 jobs:
   build:
     docker: # use the docker executor type; machine and macos executors are also supported
-      - image: circleci/python:3.6.2-stretch-browsers
+      - image: circleci/python:3.6.4
     steps:
       - checkout # check out the code in the project directory
+      
       - run:
           name: "Printing Hello world"
           command: echo "hello world"
+      
       - run:
           name: "Creating new directory.."
           command: |
@@ -24,21 +19,43 @@ jobs:
             cd output
             mkdir artifacts
             mkdir test_results
+      
+        #Use the chown command to grant CircleCI access to dependency locations.
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/
+      
+      - restore_cache: # ensure this step occurs *before* installing dependencies
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      
       - run:
-          name: "Updrading pip"
-          command: pip install --user pip
+          name: "Setting up pipenv"
+          command: |
+            sudo pip install pipenv
+            pipenv install
+
+      - save_cache:
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.6/site-packages"
+
       - run:
           name: "Execution hello.py python file"
-          command: python hello.py
+          command: pipenv run python hello.py
+      
       - run:
           name: "Getting numpy dependency"
-          command: pip install --user numpy 
+          command: pipenv install numpy
+      
+      
       - run:
           name: "Execution np.py python file"
-          command: python np.py
+          command: pipenv run python np.py test
       - store_artifacts:
           name: "Saving result in a file"
-          path: output/artifacts
+          path: output/artifacts/
           destination: reports
       - store_test_results:
-          path: output/test_results
+          path: output/test_results/
