@@ -3,40 +3,47 @@ version: 2.0
 
 jobs:
   one:
-    docker: # use the docker executor type; machine and macos executors are also supported
+    docker:
       - image: circleci/python:3.6.4
-    steps:
-      - run: echo "Running job 1"
-      - checkout # check out the code in the project directory
-      - run:
-          name: "Printing Hello world"
-          command: echo "hello world"
-      - run:
-          name: "Creating new directory.."
-          command: |
-            mkdir output
-            cd output
-            mkdir artifacts
-            mkdir test_results
-      - run:
-          name: "Updrading pip"
-          command: pip install --user pip
-      - run:
-          name: "Execution hello.py python file"
-          command: python hello.py
+    working_directory: ~/repo
 
-    two:
-      docker:
-        -image: circleci/python:3.6.4
-      steps:
-        - run: echo "Running job 2"
-        - checkout
-        - run:
-          name: "Getting numpy dependency"
-          command: pip install --user numpy
-        - run:
-          name: "Execution np.py python file"
-          command: python np.py test
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - run:
+          name: Run hello.py
+          command: |
+            . venv/bin/activate
+            python hello.py
+
+  two:
+    docker:
+      - image: circleci/python:3.6.4
+    working_directory: ~/repo
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies
+
+      - run:
+          name: Installing numpy
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install numpy
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies
+
+      - run:
+          name: Run np.py
+          command: |
+            . venv/bin/activate
+            python np.py
 
 workflows:
   version: 2
