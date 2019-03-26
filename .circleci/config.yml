@@ -15,11 +15,16 @@ aliases:
       command: |
         . venv/bin/activate
         python hello.py test
+  - env: &env
+      - image: circleci/python:3.6.4
+  - docker_env: &docker_env
+      docker:
+        - image: circleci/python:3.6.4
+
 version: 2
 jobs:
   build:
-    docker:
-      - image: circleci/python:3.6.4
+    <<: *docker_env
     working_directory: ~/repo
 
     steps:
