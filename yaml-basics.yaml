@@ -1,0 +1,67 @@
+# Block format
+just:
+  - &write something
+  - here
+  - *write
+
+# inline; Scalar: Sequences
+list: [it, lit]
+
+#Folded text
+folded: { name: Mary, age: 100 }
+
+# Scalar: Scalar
+name: 90
+decimal: 12.11
+octal: 0x21
+canonical: 1.23015e+3
+exponential: 12.3015e+02
+sexagecimal: 20:30.15
+fixed: 1,230.15
+negative infinity: -.inf
+not a number: .NaN
+null: ~
+true: y
+false: n
+string: "12345"
+
+plain: This unquoted scalar
+  spans many lines.
+
+# quoted: "So does this
+# quoted scalar.\n"
+
+product:
+  - sku: BL394
+    quantity: 4
+  - sku: BL4438H
+    quantity: 1
+
+# Eqvt to above  
+arr2: [{ sku: BL395, qty: 1234 }, { sku: BL395, qty: 1234 }]
+
+
+arr:
+  filters:
+    - sku: BL
+    - qty: wq
+
+# {
+  # "plain": "text lines", 
+  # "quoted": "text lines", 
+  # "block": [
+    # "xyz", 
+    # "abc"
+  # ]
+# }
+!!map {
+   ? !!str "plain"
+   : !!str "text lines",
+   ? !!str "quoted"
+   : !!str "text lines",
+   ? !!str "block"
+   : !!seq [
+     !!str "xyz",
+     !!str "abc"
+   ]
+}
